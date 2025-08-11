@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { CreateHuntingPlace } from "../../services/HuntingPlaceServices.jsx";
 import { GetAllVocations } from "../../services/VocationServices.jsx";
 import { GetAllLocations } from "../../services/LocationServices.jsx";
+import { GetAllCreatures } from "../../services/CreatureServices.jsx";
+import { GetAllImbues } from "../../services/ImbueServices.jsx";
 
 export const AddHuntingPlace = () => {
   const navigate = useNavigate();
   const [vocations, setVocations] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [creatures, setCreatures] = useState([]);
+  const [imbues, setImbues] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -17,15 +21,24 @@ export const AddHuntingPlace = () => {
     raw_exp: "",
     est_profit: "",
     recommended_vocation: "",
+    creature_ids: [],
+    imbue_ids: [],
     location: "",
   });
 
   useEffect(() => {
-    // Load vocations and locations
-    Promise.all([GetAllVocations(), GetAllLocations()])
-      .then(([vocationData, locationData]) => {
+    // Load vocations, locations, creatures, and imbues
+    Promise.all([
+      GetAllVocations(),
+      GetAllLocations(),
+      GetAllCreatures(),
+      GetAllImbues(),
+    ])
+      .then(([vocationData, locationData, creatureData, imbueData]) => {
         setVocations(vocationData);
         setLocations(locationData);
+        setCreatures(creatureData);
+        setImbues(imbueData);
       })
       .catch((err) => {
         setError("Failed to load form data");
@@ -41,10 +54,34 @@ export const AddHuntingPlace = () => {
     }));
   };
 
+  const handleCreatureToggle = (creatureId) => {
+    setFormData((prev) => ({
+      ...prev,
+      creature_ids: prev.creature_ids.includes(creatureId)
+        ? prev.creature_ids.filter((id) => id !== creatureId)
+        : [...prev.creature_ids, creatureId],
+    }));
+  };
+
+  const handleImbueToggle = (imbueId) => {
+    setFormData((prev) => ({
+      ...prev,
+      imbue_ids: prev.imbue_ids.includes(imbueId)
+        ? prev.imbue_ids.filter((id) => id !== imbueId)
+        : [...prev.imbue_ids, imbueId],
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (formData.creature_ids.length === 0) {
+      setError("Please select at least one creature");
+      setLoading(false);
+      return;
+    }
 
     try {
       const huntingPlaceData = {
@@ -53,6 +90,8 @@ export const AddHuntingPlace = () => {
         raw_exp: parseInt(formData.raw_exp),
         est_profit: parseInt(formData.est_profit),
         recommended_vocation: formData.recommended_vocation || null,
+        creature_ids: formData.creature_ids,
+        imbue_ids: formData.imbue_ids,
         location: parseInt(formData.location),
       };
 
@@ -135,6 +174,98 @@ export const AddHuntingPlace = () => {
             </select>
           </div>
 
+          {/* Creatures */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Creatures *
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-64 overflow-y-auto border border-gray-300 rounded-lg p-4">
+              {creatures.map((creature) => (
+                <div
+                  key={creature.id}
+                  className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                    formData.creature_ids.includes(creature.id)
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-200 hover:border-emerald-300"
+                  }`}
+                  onClick={() => handleCreatureToggle(creature.id)}
+                >
+                  {creature.image_url && (
+                    <img
+                      src={creature.image_url}
+                      alt={creature.name}
+                      className="w-12 h-12 object-contain mb-2"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  )}
+                  <div className="text-center">
+                    <div className="text-sm font-medium text-gray-900 mb-1">
+                      {creature.name}
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {creature.experience_points} XP
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={formData.creature_ids.includes(creature.id)}
+                    onChange={() => handleCreatureToggle(creature.id)}
+                    className="mt-2"
+                  />
+                </div>
+              ))}
+            </div>
+            {formData.creature_ids.length === 0 && (
+              <p className="text-red-500 text-sm mt-1">
+                Please select at least one creature
+              </p>
+            )}
+          </div>
+
+          {/* Imbues */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Recommended Imbues
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-64 overflow-y-auto border border-gray-300 rounded-lg p-4">
+              {imbues.map((imbue) => (
+                <div
+                  key={imbue.id}
+                  className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                    formData.imbue_ids.includes(imbue.id)
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-200 hover:border-emerald-300"
+                  }`}
+                  onClick={() => handleImbueToggle(imbue.id)}
+                >
+                  {imbue.image && (
+                    <img
+                      src={imbue.image}
+                      alt={imbue.name}
+                      className="w-12 h-12 object-contain mb-2"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  )}
+                  <div className="text-center">
+                    <div className="text-sm font-medium text-gray-900 mb-1">
+                      {imbue.name}
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={formData.imbue_ids.includes(imbue.id)}
+                    onChange={() => handleImbueToggle(imbue.id)}
+                    className="mt-2"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Recommended Level */}
           <div>
             <label
@@ -158,26 +289,86 @@ export const AddHuntingPlace = () => {
 
           {/* Recommended Vocation */}
           <div>
-            <label
-              htmlFor="recommended_vocation"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Recommended Vocation
             </label>
-            <select
-              id="recommended_vocation"
-              name="recommended_vocation"
-              value={formData.recommended_vocation}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
-            >
-              <option value="">Any vocation</option>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4 border border-gray-300 rounded-lg">
+              <div
+                className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                  !formData.recommended_vocation
+                    ? "border-emerald-500 bg-emerald-50"
+                    : "border-gray-200 hover:border-emerald-300"
+                }`}
+                onClick={() =>
+                  setFormData((prev) => ({ ...prev, recommended_vocation: "" }))
+                }
+              >
+                <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                  <span className="text-gray-500 text-xs">Any</span>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm font-medium text-gray-900">
+                    Any Vocation
+                  </div>
+                </div>
+                <input
+                  type="radio"
+                  name="recommended_vocation"
+                  checked={!formData.recommended_vocation}
+                  onChange={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      recommended_vocation: "",
+                    }))
+                  }
+                  className="mt-2"
+                />
+              </div>
               {vocations.map((vocation) => (
-                <option key={vocation.id} value={vocation.id}>
-                  {vocation.name}
-                </option>
+                <div
+                  key={vocation.id}
+                  className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                    formData.recommended_vocation == vocation.id
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-200 hover:border-emerald-300"
+                  }`}
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      recommended_vocation: vocation.id.toString(),
+                    }))
+                  }
+                >
+                  {vocation.image_url && (
+                    <img
+                      src={vocation.image_url}
+                      alt={vocation.name}
+                      className="w-12 h-12 object-contain mb-2"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  )}
+                  <div className="text-center">
+                    <div className="text-sm font-medium text-gray-900">
+                      {vocation.name}
+                    </div>
+                  </div>
+                  <input
+                    type="radio"
+                    name="recommended_vocation"
+                    checked={formData.recommended_vocation == vocation.id}
+                    onChange={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        recommended_vocation: vocation.id.toString(),
+                      }))
+                    }
+                    className="mt-2"
+                  />
+                </div>
               ))}
-            </select>
+            </div>
           </div>
 
           {/* Raw Experience */}

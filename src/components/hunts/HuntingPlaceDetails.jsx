@@ -6,6 +6,7 @@ import {
 } from "../../services/HuntingPlaceServices.jsx";
 import { getCurrentUser } from "../services/userServices.jsx";
 import { HuntingPlaceComments } from "./HuntingPlaceComments.jsx";
+import { CreatureCarousel } from "./CreatureCarousal.jsx";
 
 export const HuntingPlaceDetails = () => {
   const { id } = useParams();
@@ -14,7 +15,6 @@ export const HuntingPlaceDetails = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const loadHuntingPlace = () => {
     GetHuntingPlace(id)
@@ -114,7 +114,7 @@ export const HuntingPlaceDetails = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-9/10 mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-6">
         <button
@@ -139,88 +139,202 @@ export const HuntingPlaceDetails = () => {
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
           {huntingPlace.location_name || "Unnamed Hunting Place"}
         </h1>
-        <p className="text-gray-600">
-          Added by {huntingPlace.user_username || "Unknown"} •
-          {huntingPlace.created_at &&
-            ` Created ${new Date(
-              huntingPlace.created_at
-            ).toLocaleDateString()}`}
-        </p>
       </div>
 
       {/* Main Content */}
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 bg-gray-50 border-b">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-emerald-600">
-              {huntingPlace.recommended_level}
-            </div>
-            <div className="text-sm text-gray-600">Recommended Level</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              {huntingPlace.raw_exp
-                ? huntingPlace.raw_exp.toLocaleString()
-                : "N/A"}
-            </div>
-            <div className="text-sm text-gray-600">Experience/Hour</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600">
-              {huntingPlace.est_profit
-                ? huntingPlace.est_profit.toLocaleString()
-                : "N/A"}
-            </div>
-            <div className="text-sm text-gray-600">Profit/Hour (gp)</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">📍</div>
-            <div className="text-sm text-gray-600">
-              {huntingPlace.location_name || "Unknown Location"}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-indigo-600">⚔️</div>
-            <div className="text-sm text-gray-600">
-              {huntingPlace.vocation_name || "Any Vocation"}
-            </div>
-          </div>
-        </div>
+        {/* Creature Carousel */}
+        {huntingPlace.creatures && huntingPlace.creatures.length > 0 && (
+          <CreatureCarousel creatures={huntingPlace.creatures} />
+        )}
 
-        {/* Description */}
-        <div className="p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-            Description
-          </h2>
-          <div className="prose max-w-none">
-            <p className="text-gray-700 leading-relaxed">
-              {huntingPlace.description ||
-                "No description available for this hunting place."}
-            </p>
-          </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="p-6 bg-gray-50 border-t">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Additional Information
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <span className="font-medium text-gray-700">Added by:</span>
-              <span className="ml-2 text-gray-600">
-                {huntingPlace.user_username || "Unknown user"}
-              </span>
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Content */}
+          <div className="lg:col-span-2">
+            {/* Description */}
+            <div className="p-6">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                Description
+              </h2>
+              <div className="prose max-w-none">
+                <p className="text-gray-700 leading-relaxed">
+                  {huntingPlace.description ||
+                    "No description available for this hunting place."}
+                </p>
+              </div>
             </div>
-            {huntingPlace.updated_at && (
-              <div>
-                <span className="font-medium text-gray-700">Last updated:</span>
-                <span className="ml-2 text-gray-600">
-                  {new Date(huntingPlace.updated_at).toLocaleDateString()}
-                </span>
+
+            {/* Creatures Section */}
+            {huntingPlace.creatures && huntingPlace.creatures.length > 0 && (
+              <div className="p-6 bg-gray-50 border-t">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Creatures
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {huntingPlace.creatures.map((creature) => (
+                    <div
+                      key={creature.id}
+                      className="flex flex-col items-center p-3 bg-white rounded-lg shadow-sm"
+                    >
+                      {creature.image_url && (
+                        <img
+                          src={creature.image_url}
+                          alt={creature.name}
+                          className="w-16 h-16 object-contain mb-2"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      )}
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-gray-900 mb-1">
+                          {creature.name}
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {creature.experience_points} XP
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            {/* Imbues Section */}
+            {huntingPlace.imbues && huntingPlace.imbues.length > 0 && (
+              <div className="p-6 bg-gray-50 border-t">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Recommended Imbues
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {huntingPlace.imbues.map((imbue) => (
+                    <div
+                      key={imbue.id}
+                      className="flex flex-col items-center p-3 bg-white rounded-lg shadow-sm"
+                    >
+                      {imbue.image && (
+                        <img
+                          src={imbue.image}
+                          alt={imbue.name}
+                          className="w-16 h-16 object-contain mb-2"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      )}
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-gray-900 mb-1">
+                          {imbue.name}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Stats */}
+          <div className="lg:col-span-1 bg-gray-50 border-l">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                Stats & Info
+              </h3>
+
+              {/* Stats Grid - Vertical Layout */}
+              <div className="space-y-6">
+                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                  <div className="text-3xl font-bold text-emerald-600">
+                    {huntingPlace.recommended_level}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Recommended Level
+                  </div>
+                </div>
+
+                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {huntingPlace.raw_exp
+                      ? huntingPlace.raw_exp.toLocaleString()
+                      : "N/A"}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Experience/Hour
+                  </div>
+                </div>
+
+                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                  <div className="text-2xl font-bold text-yellow-600">
+                    {huntingPlace.est_profit
+                      ? huntingPlace.est_profit.toLocaleString()
+                      : "N/A"}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Profit/Hour (gp)
+                  </div>
+                </div>
+
+                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                  <div className="text-2xl font-bold text-blue-600">📍</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    {huntingPlace.location_name || "Unknown Location"}
+                  </div>
+                </div>
+
+                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                  {huntingPlace.vocation_image_url ? (
+                    <img
+                      src={huntingPlace.vocation_image_url}
+                      alt={huntingPlace.vocation_name || "Vocation"}
+                      className="w-12 h-12 object-contain mx-auto mb-2"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextElementSibling.style.display = "block";
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className="text-2xl font-bold text-indigo-600"
+                    style={{
+                      display: huntingPlace.vocation_image_url
+                        ? "none"
+                        : "block",
+                    }}
+                  >
+                    ⚔️
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    {huntingPlace.vocation_name || "Any Vocation"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Info */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
+                  Additional Information
+                </h4>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-700">Added by:</span>
+                    <div className="text-gray-600 mt-1">
+                      {huntingPlace.user_username || "Unknown user"}
+                    </div>
+                  </div>
+                  {huntingPlace.updated_at && (
+                    <div>
+                      <span className="font-medium text-gray-700">
+                        Last updated:
+                      </span>
+                      <div className="text-gray-600 mt-1">
+                        {new Date(huntingPlace.updated_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
