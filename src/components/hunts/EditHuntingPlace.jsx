@@ -8,6 +8,7 @@ import { GetAllVocations } from "../../services/VocationServices.jsx";
 import { GetAllLocations } from "../../services/LocationServices.jsx";
 import { GetAllCreatures } from "../../services/CreatureServices.jsx";
 import { GetAllImbues } from "../../services/ImbueServices.jsx";
+import { GetAllItems } from "../../services/ItemServices.jsx";
 
 export const EditHuntingPlace = () => {
   const { id } = useParams();
@@ -16,9 +17,33 @@ export const EditHuntingPlace = () => {
   const [locations, setLocations] = useState([]);
   const [creatures, setCreatures] = useState([]);
   const [imbues, setImbues] = useState([]);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  // Search states
+  const [creatureSearch, setCreatureSearch] = useState("");
+  const [imbueSearch, setImbueSearch] = useState("");
+  const [itemSearch, setItemSearch] = useState("");
+  const [vocationSearch, setVocationSearch] = useState("");
+
+  // Filtered arrays
+  const filteredCreatures = creatures.filter((creature) =>
+    creature.name.toLowerCase().includes(creatureSearch.toLowerCase())
+  );
+
+  const filteredImbues = imbues.filter((imbue) =>
+    imbue.name.toLowerCase().includes(imbueSearch.toLowerCase())
+  );
+
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(itemSearch.toLowerCase())
+  );
+
+  const filteredVocations = vocations.filter((vocation) =>
+    vocation.name.toLowerCase().includes(vocationSearch.toLowerCase())
+  );
 
   const [formData, setFormData] = useState({
     description: "",
@@ -28,17 +53,19 @@ export const EditHuntingPlace = () => {
     recommended_vocation: "",
     creature_ids: [],
     imbue_ids: [],
+    item_ids: [],
     location: "",
   });
 
   useEffect(() => {
-    // Load hunting place data, vocations, locations, and creatures
+    // Load hunting place data, vocations, locations, creatures, imbues, and items
     Promise.all([
       GetHuntingPlace(id),
       GetAllVocations(),
       GetAllLocations(),
       GetAllCreatures(),
       GetAllImbues(),
+      GetAllItems(),
     ])
       .then(
         ([
@@ -47,6 +74,7 @@ export const EditHuntingPlace = () => {
           locationData,
           creatureData,
           imbueData,
+          itemData,
         ]) => {
           setFormData({
             description: huntingPlaceData.description || "",
@@ -60,12 +88,16 @@ export const EditHuntingPlace = () => {
             imbue_ids: huntingPlaceData.imbues
               ? huntingPlaceData.imbues.map((i) => i.id)
               : [],
+            item_ids: huntingPlaceData.items
+              ? huntingPlaceData.items.map((item) => item.id)
+              : [],
             location: huntingPlaceData.location.toString(),
           });
           setVocations(vocationData);
           setLocations(locationData);
           setCreatures(creatureData);
           setImbues(imbueData);
+          setItems(itemData);
           setLoading(false);
         }
       )
@@ -102,6 +134,15 @@ export const EditHuntingPlace = () => {
     }));
   };
 
+  const handleItemToggle = (itemId) => {
+    setFormData((prev) => ({
+      ...prev,
+      item_ids: prev.item_ids.includes(itemId)
+        ? prev.item_ids.filter((id) => id !== itemId)
+        : [...prev.item_ids, itemId],
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -122,6 +163,7 @@ export const EditHuntingPlace = () => {
         recommended_vocation: formData.recommended_vocation || null,
         creature_ids: formData.creature_ids,
         imbue_ids: formData.imbue_ids,
+        item_ids: formData.item_ids,
         location: parseInt(formData.location),
       };
 
@@ -224,8 +266,18 @@ export const EditHuntingPlace = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Creatures *
             </label>
+            {/* Creature Search Bar */}
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Search creatures..."
+                value={creatureSearch}
+                onChange={(e) => setCreatureSearch(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-64 overflow-y-auto border border-gray-300 rounded-lg p-4">
-              {creatures.map((creature) => (
+              {filteredCreatures.map((creature) => (
                 <div
                   key={creature.id}
                   className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${
@@ -274,8 +326,18 @@ export const EditHuntingPlace = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Recommended Imbues
             </label>
+            {/* Imbue Search Bar */}
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Search imbues..."
+                value={imbueSearch}
+                onChange={(e) => setImbueSearch(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-64 overflow-y-auto border border-gray-300 rounded-lg p-4">
-              {imbues.map((imbue) => (
+              {filteredImbues.map((imbue) => (
                 <div
                   key={imbue.id}
                   className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${
@@ -311,6 +373,58 @@ export const EditHuntingPlace = () => {
             </div>
           </div>
 
+          {/* Items */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Items that Drop
+            </label>
+            {/* Item Search Bar */}
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Search items..."
+                value={itemSearch}
+                onChange={(e) => setItemSearch(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-64 overflow-y-auto border border-gray-300 rounded-lg p-4">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${
+                    formData.item_ids.includes(item.id)
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-200 hover:border-emerald-300"
+                  }`}
+                  onClick={() => handleItemToggle(item.id)}
+                >
+                  {item.image_url && (
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="w-12 h-12 object-contain mb-2"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  )}
+                  <div className="text-center">
+                    <div className="text-sm font-medium text-gray-900 mb-1">
+                      {item.name}
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={formData.item_ids.includes(item.id)}
+                    onChange={() => handleItemToggle(item.id)}
+                    className="mt-2"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Recommended Level */}
           <div>
             <label
@@ -337,6 +451,16 @@ export const EditHuntingPlace = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Recommended Vocation
             </label>
+            {/* Vocation Search Bar */}
+            <div className="mb-3">
+              <input
+                type="text"
+                placeholder="Search vocations..."
+                value={vocationSearch}
+                onChange={(e) => setVocationSearch(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-4 border border-gray-300 rounded-lg">
               <div
                 className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${
@@ -369,7 +493,7 @@ export const EditHuntingPlace = () => {
                   className="mt-2"
                 />
               </div>
-              {vocations.map((vocation) => (
+              {filteredVocations.map((vocation) => (
                 <div
                   key={vocation.id}
                   className={`flex flex-col items-center p-3 border rounded-lg cursor-pointer transition-all ${

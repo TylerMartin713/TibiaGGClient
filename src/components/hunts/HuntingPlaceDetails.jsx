@@ -233,6 +233,39 @@ export const HuntingPlaceDetails = () => {
                 </div>
               </div>
             )}
+
+            {/* Items Section */}
+            {huntingPlace.items && huntingPlace.items.length > 0 && (
+              <div className="p-6 bg-gray-50 border-t">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Items that Drop
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {huntingPlace.items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex flex-col items-center p-3 bg-white rounded-lg shadow-sm"
+                    >
+                      {item.image_url && (
+                        <img
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-16 h-16 object-contain mb-2"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      )}
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-gray-900 mb-1">
+                          {item.name}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Column - Stats */}
