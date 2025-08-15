@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "../services/userServices.jsx";
 import { GetUserCharacters } from "../../services/CharacterServices.jsx";
-import { GetAllHuntingPlaces } from "../../services/HuntingPlaceServices.jsx";
+import {
+  DeleteHuntingPlace,
+  GetAllHuntingPlaces,
+} from "../../services/HuntingPlaceServices.jsx";
 import { GetUserFavorites } from "../../services/FavoriteServices.jsx";
 import { useNavigate } from "react-router-dom";
 
@@ -47,6 +50,27 @@ export const Profile = () => {
 
     fetchUserData();
   }, []);
+
+  const handleDelete = async (huntId) => {
+    try {
+      await DeleteHuntingPlace(huntId);
+      // Remove the deleted hunt from the userHunts state
+      setUserHunts(userHunts.filter((hunt) => hunt.id !== huntId));
+    } catch (err) {
+      setError("Failed to delete hunting place");
+      console.error("Error deleting hunting place:", err);
+    }
+  };
+
+  const confirmDelete = (huntId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this hunting place? This action cannot be undone."
+      )
+    ) {
+      handleDelete(huntId);
+    }
+  };
 
   if (loading) {
     return (
@@ -265,7 +289,8 @@ export const Profile = () => {
                 {userHunts.map((hunt) => (
                   <div
                     key={hunt.id}
-                    className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-amber-500 transition-colors"
+                    className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-amber-500 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/hunting-places/${hunt.id}`)}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -288,18 +313,30 @@ export const Profile = () => {
                         </div>
                       </div>
                       <div className="flex space-x-2">
-                        <button className="text-amber-400 hover:text-amber-300 p-1">
+                        <button
+                          className="text-emerald-400 hover:text-emerald-200 p-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/hunting-places/${hunt.id}/edit`);
+                          }}
+                        >
                           <svg
-                            className="w-4 h-4"
+                            className="w-10 h-10"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                           </svg>
                         </button>
-                        <button className="text-red-400 hover:text-red-300 p-1">
+                        <button
+                          className="text-red-400 hover:text-red-300 p-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            confirmDelete(hunt.id);
+                          }}
+                        >
                           <svg
-                            className="w-4 h-4"
+                            className="w-10 h-10"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -403,6 +440,7 @@ export const Profile = () => {
                       </div>
                       <button
                         className="text-red-400 hover:text-red-300 p-1"
+                        onClick={confirmDelete}
                         title="Remove from favorites"
                       >
                         <svg

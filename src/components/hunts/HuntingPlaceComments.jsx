@@ -32,15 +32,13 @@ export const HuntingPlaceComments = ({ huntingPlace, onCommentAdded }) => {
 
   return (
     <div className="mt-8 border-t pt-8">
-      <h3 className="text-2xl font-semibold text-gray-900 mb-6">
+      <h3 className="text-2xl font-semibold text-white mb-6">
         Comments ({huntingPlace.comment_count || 0})
       </h3>
 
       {/* Add Comment Form */}
       <div className="mb-8">
-        <h4 className="text-lg font-medium text-gray-900 mb-4">
-          Add a Comment
-        </h4>
+        <h4 className="text-lg font-medium text-white mb-4">Add a Comment</h4>
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
@@ -55,7 +53,7 @@ export const HuntingPlaceComments = ({ huntingPlace, onCommentAdded }) => {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Share your experience with this hunting place..."
               rows="4"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+              className="w-full px-3 py-2 text-white border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
               required
             />
           </div>
@@ -107,8 +105,8 @@ export const HuntingPlaceComments = ({ huntingPlace, onCommentAdded }) => {
           ))
         ) : (
           <div className="text-center py-8">
-            <div className="text-gray-500">No comments yet.</div>
-            <div className="text-gray-400 text-sm mt-1">
+            <div className="text-white">No comments yet.</div>
+            <div className="text-white text-sm mt-1">
               Be the first to share your experience!
             </div>
           </div>

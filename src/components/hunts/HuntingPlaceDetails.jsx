@@ -73,8 +73,8 @@ export const HuntingPlaceDetails = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg text-gray-600">
+      <div className="min-h-screen bg-gray-900 flex justify-center items-center h-64">
+        <div className="text-lg text-gray-300">
           Loading hunting place details...
         </div>
       </div>
@@ -83,9 +83,9 @@ export const HuntingPlaceDetails = () => {
 
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">{error}</div>
+      <div className="min-h-screen bg-gray-900 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-red-900 border border-red-700 rounded-lg p-4">
+          <div className="text-red-200">{error}</div>
           <button
             onClick={() => navigate("/hunting-places")}
             className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
@@ -99,9 +99,9 @@ export const HuntingPlaceDetails = () => {
 
   if (!huntingPlace) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-gray-900 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center py-8">
-          <div className="text-gray-500 text-lg">Hunting place not found.</div>
+          <div className="text-gray-400 text-lg">Hunting place not found.</div>
           <button
             onClick={() => navigate("/hunting-places")}
             className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg"
@@ -114,12 +114,12 @@ export const HuntingPlaceDetails = () => {
   }
 
   return (
-    <div className="max-w-9/10 mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-900 max-w-9/10 mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-6">
         <button
           onClick={() => navigate("/hunting-places")}
-          className="flex items-center text-emerald-600 hover:text-emerald-700 mb-4"
+          className="flex items-center text-emerald-400 hover:text-emerald-300 mb-4"
         >
           <svg
             className="w-4 h-4 mr-2"
@@ -136,13 +136,13 @@ export const HuntingPlaceDetails = () => {
           </svg>
           Back to Hunting Places
         </button>
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
+        <h1 className="text-4xl font-bold text-white mb-2">
           {huntingPlace.location_name || "Unnamed Hunting Place"}
         </h1>
       </div>
 
       {/* Main Content */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700">
         {/* Creature Carousel */}
         {huntingPlace.creatures && huntingPlace.creatures.length > 0 && (
           <CreatureCarousel creatures={huntingPlace.creatures} />
@@ -154,11 +154,11 @@ export const HuntingPlaceDetails = () => {
           <div className="lg:col-span-2">
             {/* Description */}
             <div className="p-6">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-2xl font-semibold text-white mb-4">
                 Description
               </h2>
               <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-gray-300 leading-relaxed">
                   {huntingPlace.description ||
                     "No description available for this hunting place."}
                 </p>
@@ -167,15 +167,15 @@ export const HuntingPlaceDetails = () => {
 
             {/* Creatures Section */}
             {huntingPlace.creatures && huntingPlace.creatures.length > 0 && (
-              <div className="p-6 bg-gray-50 border-t">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="p-6 bg-gray-700 border-t border-gray-600">
+                <h3 className="text-lg font-semibold text-white mb-4">
                   Creatures
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {huntingPlace.creatures.map((creature) => (
                     <div
                       key={creature.id}
-                      className="flex flex-col items-center p-3 bg-white rounded-lg shadow-sm"
+                      className="flex flex-col items-center p-3 bg-gray-800 rounded-lg shadow-sm border border-gray-600"
                     >
                       {creature.image_url && (
                         <img
@@ -188,10 +188,10 @@ export const HuntingPlaceDetails = () => {
                         />
                       )}
                       <div className="text-center">
-                        <div className="text-sm font-medium text-gray-900 mb-1">
+                        <div className="text-sm font-medium text-white mb-1">
                           {creature.name}
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-gray-400">
                           {creature.experience_points} XP
                         </div>
                       </div>
@@ -203,15 +203,15 @@ export const HuntingPlaceDetails = () => {
 
             {/* Imbues Section */}
             {huntingPlace.imbues && huntingPlace.imbues.length > 0 && (
-              <div className="p-6 bg-gray-50 border-t">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="p-6 bg-gray-700 border-t border-gray-600">
+                <h3 className="text-lg font-semibold text-white mb-4">
                   Recommended Imbues
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {huntingPlace.imbues.map((imbue) => (
                     <div
                       key={imbue.id}
-                      className="flex flex-col items-center p-3 bg-white rounded-lg shadow-sm"
+                      className="flex flex-col items-center p-3 bg-gray-800 rounded-lg shadow-sm border border-gray-600"
                     >
                       {imbue.image && (
                         <img
@@ -224,7 +224,7 @@ export const HuntingPlaceDetails = () => {
                         />
                       )}
                       <div className="text-center">
-                        <div className="text-sm font-medium text-gray-900 mb-1">
+                        <div className="text-sm font-medium text-white mb-1">
                           {imbue.name}
                         </div>
                       </div>
@@ -236,15 +236,15 @@ export const HuntingPlaceDetails = () => {
 
             {/* Items Section */}
             {huntingPlace.items && huntingPlace.items.length > 0 && (
-              <div className="p-6 bg-gray-50 border-t">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="p-6 bg-gray-700 border-t border-gray-600">
+                <h3 className="text-lg font-semibold text-white mb-4">
                   Items that Drop
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {huntingPlace.items.map((item) => (
                     <div
                       key={item.id}
-                      className="flex flex-col items-center p-3 bg-white rounded-lg shadow-sm"
+                      className="flex flex-col items-center p-3 bg-gray-800 rounded-lg shadow-sm border border-gray-600"
                     >
                       {item.image_url && (
                         <img
@@ -257,7 +257,7 @@ export const HuntingPlaceDetails = () => {
                         />
                       )}
                       <div className="text-center">
-                        <div className="text-sm font-medium text-gray-900 mb-1">
+                        <div className="text-sm font-medium text-white mb-1">
                           {item.name}
                         </div>
                       </div>
@@ -269,53 +269,53 @@ export const HuntingPlaceDetails = () => {
           </div>
 
           {/* Right Column - Stats */}
-          <div className="lg:col-span-1 bg-gray-50 border-l">
+          <div className="lg:col-span-1 bg-gray-700 border-l border-gray-600">
             <div className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+              <h3 className="text-lg font-semibold text-white mb-6">
                 Stats & Info
               </h3>
 
               {/* Stats Grid - Vertical Layout */}
               <div className="space-y-6">
-                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
-                  <div className="text-3xl font-bold text-emerald-600">
+                <div className="text-center bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-600">
+                  <div className="text-3xl font-bold text-emerald-400">
                     {huntingPlace.recommended_level}
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-sm text-gray-400 mt-1">
                     Recommended Level
                   </div>
                 </div>
 
-                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
-                  <div className="text-2xl font-bold text-purple-600">
+                <div className="text-center bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-600">
+                  <div className="text-2xl font-bold text-purple-400">
                     {huntingPlace.raw_exp
                       ? huntingPlace.raw_exp.toLocaleString()
                       : "N/A"}
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-sm text-gray-400 mt-1">
                     Experience/Hour
                   </div>
                 </div>
 
-                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
-                  <div className="text-2xl font-bold text-yellow-600">
+                <div className="text-center bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-600">
+                  <div className="text-2xl font-bold text-yellow-400">
                     {huntingPlace.est_profit
                       ? huntingPlace.est_profit.toLocaleString()
                       : "N/A"}
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-sm text-gray-400 mt-1">
                     Profit/Hour (gp)
                   </div>
                 </div>
 
-                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
-                  <div className="text-2xl font-bold text-blue-600">📍</div>
-                  <div className="text-sm text-gray-600 mt-1">
+                <div className="text-center bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-600">
+                  <div className="text-2xl font-bold text-blue-400">📍</div>
+                  <div className="text-sm text-gray-400 mt-1">
                     {huntingPlace.location_name || "Unknown Location"}
                   </div>
                 </div>
 
-                <div className="text-center bg-white rounded-lg p-4 shadow-sm">
+                <div className="text-center bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-600">
                   {huntingPlace.vocation_image_url ? (
                     <img
                       src={huntingPlace.vocation_image_url}
@@ -328,7 +328,7 @@ export const HuntingPlaceDetails = () => {
                     />
                   ) : null}
                   <div
-                    className="text-2xl font-bold text-indigo-600"
+                    className="text-2xl font-bold text-indigo-400"
                     style={{
                       display: huntingPlace.vocation_image_url
                         ? "none"
@@ -337,30 +337,30 @@ export const HuntingPlaceDetails = () => {
                   >
                     ⚔️
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className="text-sm text-gray-400 mt-1">
                     {huntingPlace.vocation_name || "Any Vocation"}
                   </div>
                 </div>
               </div>
 
               {/* Additional Info */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
+              <div className="mt-8 pt-6 border-t border-gray-600">
+                <h4 className="text-sm font-semibold text-white mb-4 uppercase tracking-wide">
                   Additional Information
                 </h4>
                 <div className="space-y-3 text-sm">
                   <div>
-                    <span className="font-medium text-gray-700">Added by:</span>
-                    <div className="text-gray-600 mt-1">
+                    <span className="font-medium text-gray-300">Added by:</span>
+                    <div className="text-gray-400 mt-1">
                       {huntingPlace.user_username || "Unknown user"}
                     </div>
                   </div>
                   {huntingPlace.updated_at && (
                     <div>
-                      <span className="font-medium text-gray-700">
+                      <span className="font-medium text-gray-300">
                         Last updated:
                       </span>
-                      <div className="text-gray-600 mt-1">
+                      <div className="text-gray-400 mt-1">
                         {new Date(huntingPlace.updated_at).toLocaleDateString()}
                       </div>
                     </div>
@@ -372,7 +372,7 @@ export const HuntingPlaceDetails = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="p-6 border-t">
+        <div className="p-6 border-t border-gray-600 bg-gray-800">
           <div className="flex flex-wrap gap-4">
             {isCreator && (
               <button

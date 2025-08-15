@@ -18,6 +18,7 @@ export const ApplicationViews = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route element={<Authorized />}>
+          {/* HOMEPAGE VIEW */}
           <Route path="/" element={<App />} />
           {/* ALL THE HUNTING PLACE ROUTES */}
           <Route path="/hunting-places" element={<HuntingPlaces />} />
