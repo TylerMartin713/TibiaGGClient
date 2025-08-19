@@ -63,3 +63,18 @@ export const DeleteCharacter = async (id) => {
     throw error;
   }
 };
+
+export const SearchAndAddCharacter = async (characterName) => {
+  try {
+    const response = await apiRequest(
+      `http://localhost:8000/api/character/${characterName}`,
+      {
+        method: "GET",
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error searching and adding character:", error);
+    throw error;
+  }
+};

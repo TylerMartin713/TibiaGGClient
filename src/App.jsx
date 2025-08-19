@@ -162,7 +162,7 @@ export const App = () => {
                         <h4 className="text-lg font-semibold text-gray-300 mb-3">
                           Creatures:
                         </h4>
-                        <div className="flex gap-3 overflow-x-auto pb-2">
+                        <div className="flex justify-center gap-3  pb-2">
                           {huntingPlaces[currentHuntIndex].creatures.map(
                             (creature) => (
                               <div
@@ -332,6 +332,8 @@ export const App = () => {
             </button>
           </div>
         </div>
+
+        {/* Footer removed - handled by Authorized component */}
       </div>
     </div>
   );

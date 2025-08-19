@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Footer } from "../footer/footer.jsx";
 
 export const Register = () => {
   const [email, setEmail] = useState("admina@straytor.com");
@@ -35,91 +36,144 @@ export const Register = () => {
   };
 
   return (
-    <main className="container--login">
-      <dialog className="dialog dialog--auth" ref={existDialog}>
-        <div>User does not exist</div>
-        <button
-          className="button--close"
-          onClick={() => existDialog.current.close()}
-        >
-          Close
-        </button>
-      </dialog>
+    <div className="min-h-screen bg-gray-900 flex flex-col">
+      <div className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div>
+            <div className="text-center">
+              <h1 className="text-5xl font-bold text-amber-400 mb-2">
+                TibiaGG
+              </h1>
+              <div className="text-6xl mb-4">⚔️</div>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Join the Adventure!
+              </h2>
+              <p className="text-gray-400">
+                Create your account and start exploring Tibia
+              </p>
+            </div>
+          </div>
 
-      <section>
-        <form className="form--login" onSubmit={handleRegister}>
-          <h1 className="text-4xl mt-7 mb-3">TibiaGG</h1>
-          <h2 className="text-xl mb-10">Register new account</h2>
-          <fieldset className="mb-4">
-            <label htmlFor="firstName"> First name </label>
-            <input
-              type="text"
-              id="firstName"
-              value={firstName}
-              onChange={(evt) => setFirstName(evt.target.value)}
-              className="form-control"
-              placeholder=""
-              required
-              autoFocus
-            />
-          </fieldset>
-          <fieldset className="mb-4">
-            <label htmlFor="lastName"> Last name </label>
-            <input
-              type="text"
-              id="lastName"
-              value={lastName}
-              onChange={(evt) => setLastName(evt.target.value)}
-              className="form-control"
-              placeholder=""
-              required
-              autoFocus
-            />
-          </fieldset>
-          <fieldset className="mb-4">
-            <label htmlFor="inputEmail"> Email address </label>
-            <input
-              type="email"
-              id="inputEmail"
-              value={email}
-              onChange={(evt) => setEmail(evt.target.value)}
-              className="form-control"
-              placeholder="Email address"
-              required
-              autoFocus
-            />
-          </fieldset>
-          <fieldset className="mb-4">
-            <label htmlFor="inputPassword"> Password </label>
-            <input
-              type="password"
-              id="inputPassword"
-              value={password}
-              onChange={(evt) => setPassword(evt.target.value)}
-              className="form-control"
-              placeholder="Password"
-            />
-          </fieldset>
-          <fieldset>
-            <button
-              type="submit"
-              className="button p-3 rounded-md bg-blue-800 text-blue-100"
-            >
-              Register
-            </button>
-          </fieldset>
-        </form>
-      </section>
-      <div className="loginLinks">
-        <section className="link--register">
-          <Link
-            className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
-            to="/login"
+          <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 p-8">
+            <form className="space-y-6" onSubmit={handleRegister}>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="firstName"
+                    className="block text-sm font-medium text-gray-300 mb-2"
+                  >
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    value={firstName}
+                    onChange={(evt) => setFirstName(evt.target.value)}
+                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                    placeholder="First name"
+                    required
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="lastName"
+                    className="block text-sm font-medium text-gray-300 mb-2"
+                  >
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    value={lastName}
+                    onChange={(evt) => setLastName(evt.target.value)}
+                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                    placeholder="Last name"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="inputEmail"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="inputEmail"
+                  value={email}
+                  onChange={(evt) => setEmail(evt.target.value)}
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="inputPassword"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="inputPassword"
+                  value={password}
+                  onChange={(evt) => setPassword(evt.target.value)}
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                  placeholder="Create a password"
+                  required
+                />
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                >
+                  Create Account
+                </button>
+              </div>
+
+              <div className="text-center">
+                <Link
+                  to="/login"
+                  className="text-amber-400 hover:text-amber-300 font-medium transition-colors"
+                >
+                  Already have an account? Sign in →
+                </Link>
+              </div>
+            </form>
+          </div>
+
+          {/* Error Dialog */}
+          <dialog
+            className="bg-gray-800 text-white rounded-lg border border-red-500 p-6 backdrop:bg-black backdrop:bg-opacity-50"
+            ref={existDialog}
           >
-            Already have an account?
-          </Link>
-        </section>
+            <div className="text-center">
+              <div className="text-4xl mb-4">⚠️</div>
+              <h3 className="text-xl font-bold text-red-400 mb-2">
+                Registration Failed
+              </h3>
+              <p className="text-gray-300 mb-6">
+                Unable to create account. Please try again or contact support.
+              </p>
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
+                onClick={() => existDialog.current.close()}
+              >
+                Try Again
+              </button>
+            </div>
+          </dialog>
+        </div>
       </div>
-    </main>
+      <Footer />
+    </div>
   );
 };

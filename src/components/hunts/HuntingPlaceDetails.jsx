@@ -4,9 +4,42 @@ import {
   GetHuntingPlace,
   DeleteHuntingPlace,
 } from "../../services/HuntingPlaceServices.jsx";
+import { AddToFavorites } from "../../services/FavoriteServices.jsx";
 import { getCurrentUser } from "../services/userServices.jsx";
 import { HuntingPlaceComments } from "./HuntingPlaceComments.jsx";
 import { CreatureCarousel } from "./CreatureCarousal.jsx";
+
+// Helper function to extract YouTube video ID from URL
+const getYouTubeVideoId = (url) => {
+  if (!url) return null;
+
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+
+  return match && match[2].length === 11 ? match[2] : null;
+};
+
+// YouTube Embed Component
+const YouTubeEmbed = ({ url }) => {
+  const videoId = getYouTubeVideoId(url);
+
+  if (!videoId) return null;
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="aspect-video w-full">
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title="Hunting Place Video"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full rounded-lg shadow-lg"
+        />
+      </div>
+    </div>
+  );
+};
 
 export const HuntingPlaceDetails = () => {
   const { id } = useParams();
@@ -15,6 +48,7 @@ export const HuntingPlaceDetails = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAddingToFavorites, setIsAddingToFavorites] = useState(false);
 
   const loadHuntingPlace = () => {
     GetHuntingPlace(id)
@@ -62,14 +96,29 @@ export const HuntingPlaceDetails = () => {
     }
   };
 
+  const handleAddToFavorites = async () => {
+    if (!currentUser) {
+      alert("Please log in to add favorites");
+      return;
+    }
+
+    setIsAddingToFavorites(true);
+    try {
+      await AddToFavorites(id);
+      alert("Added to favorites successfully!");
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+      alert(
+        "Failed to add to favorites. You may have already favorited this place."
+      );
+    } finally {
+      setIsAddingToFavorites(false);
+    }
+  };
+
   // Check if current user is the creator
   const isCreator =
     currentUser && huntingPlace && currentUser.id === huntingPlace.user;
-
-  // Debug logging
-  console.log("Current user:", currentUser);
-  console.log("Hunting place:", huntingPlace);
-  console.log("Is creator?", isCreator);
 
   if (loading) {
     return (
@@ -371,6 +420,16 @@ export const HuntingPlaceDetails = () => {
           </div>
         </div>
 
+        {/* YouTube Video */}
+        {huntingPlace.youtube_url && (
+          <div className="p-6 border-t border-gray-600 bg-gray-800">
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              Video Guide
+            </h2>
+            <YouTubeEmbed url={huntingPlace.youtube_url} />
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="p-6 border-t border-gray-600 bg-gray-800">
           <div className="flex flex-wrap gap-4">
@@ -383,13 +442,11 @@ export const HuntingPlaceDetails = () => {
               </button>
             )}
             <button
-              onClick={() => {
-                // Add to favorites functionality
-                console.log("Add to favorites:", id);
-              }}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              onClick={handleAddToFavorites}
+              disabled={isAddingToFavorites}
+              className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-yellow-800 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-colors"
             >
-              Add to Favorites
+              {isAddingToFavorites ? "Adding..." : "Add to Favorites"}
             </button>
             <button
               onClick={() => {

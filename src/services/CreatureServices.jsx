@@ -13,3 +13,7 @@ export const SearchCreatures = (query) => {
     `http://localhost:8000/creatures/search?q=${encodeURIComponent(query)}`
   );
 };
+
+export const SearchAndAddCreature = (creatureName) => {
+  return apiRequest(`http://localhost:8000/api/creature/${creatureName}/`);
+};

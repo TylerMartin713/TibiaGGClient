@@ -50,6 +50,7 @@ export const EditHuntingPlace = () => {
     recommended_level: "",
     raw_exp: "",
     est_profit: "",
+    youtube_url: "",
     recommended_vocation: "",
     creature_ids: [],
     imbue_ids: [],
@@ -81,6 +82,7 @@ export const EditHuntingPlace = () => {
             recommended_level: huntingPlaceData.recommended_level.toString(),
             raw_exp: huntingPlaceData.raw_exp.toString(),
             est_profit: huntingPlaceData.est_profit.toString(),
+            youtube_url: huntingPlaceData.youtube_url || "",
             recommended_vocation: huntingPlaceData.recommended_vocation || "",
             creature_ids: huntingPlaceData.creatures
               ? huntingPlaceData.creatures.map((c) => c.id)
@@ -160,6 +162,7 @@ export const EditHuntingPlace = () => {
         recommended_level: parseInt(formData.recommended_level),
         raw_exp: parseInt(formData.raw_exp),
         est_profit: parseInt(formData.est_profit),
+        youtube_url: formData.youtube_url || null,
         recommended_vocation: formData.recommended_vocation || null,
         creature_ids: formData.creature_ids,
         imbue_ids: formData.imbue_ids,
@@ -596,6 +599,28 @@ export const EditHuntingPlace = () => {
               placeholder="Describe the hunting place, strategies, requirements, etc..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
             />
+          </div>
+
+          {/* YouTube URL */}
+          <div>
+            <label
+              htmlFor="youtube_url"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              YouTube Video URL (Optional)
+            </label>
+            <input
+              type="url"
+              id="youtube_url"
+              name="youtube_url"
+              value={formData.youtube_url}
+              onChange={handleInputChange}
+              placeholder="https://www.youtube.com/watch?v=example"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+            />
+            <p className="text-sm text-gray-600 mt-1">
+              Add a YouTube video to showcase this hunting place (optional)
+            </p>
           </div>
 
           {/* Submit Button */}

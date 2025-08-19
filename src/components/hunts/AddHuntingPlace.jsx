@@ -44,6 +44,7 @@ export const AddHuntingPlace = () => {
     recommended_level: "",
     raw_exp: "",
     est_profit: "",
+    youtube_url: "",
     recommended_vocation: "",
     creature_ids: [],
     imbue_ids: [],
@@ -127,6 +128,7 @@ export const AddHuntingPlace = () => {
         recommended_level: parseInt(formData.recommended_level),
         raw_exp: parseInt(formData.raw_exp),
         est_profit: parseInt(formData.est_profit),
+        youtube_url: formData.youtube_url || null,
         recommended_vocation: formData.recommended_vocation || null,
         creature_ids: formData.creature_ids,
         imbue_ids: formData.imbue_ids,
@@ -216,7 +218,16 @@ export const AddHuntingPlace = () => {
           {/* Creatures */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Creatures *
+              Creatures *{" "}
+              <span className="ml-5">
+                Don't see Creature?{" "}
+                <button
+                  onClick={() => navigate("/hunting-places/add-creature")}
+                  className="px-2 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                >
+                  Add Creature
+                </button>
+              </span>
             </label>
             {/* Creature Search Bar */}
             <div className="mb-3">
@@ -548,6 +559,28 @@ export const AddHuntingPlace = () => {
               placeholder="Describe the hunting place, strategies, requirements, etc..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
             />
+          </div>
+
+          {/* YouTube URL */}
+          <div>
+            <label
+              htmlFor="youtube_url"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              YouTube Video URL (Optional)
+            </label>
+            <input
+              type="url"
+              id="youtube_url"
+              name="youtube_url"
+              value={formData.youtube_url}
+              onChange={handleInputChange}
+              placeholder="https://www.youtube.com/watch?v=example"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
+            />
+            <p className="text-sm text-gray-600 mt-1">
+              Add a YouTube video to showcase this hunting place (optional)
+            </p>
           </div>
 
           {/* Submit Button */}

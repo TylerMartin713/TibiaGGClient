@@ -10,6 +10,7 @@ import { AddHuntingPlace } from "./hunts/AddHuntingPlace.jsx";
 import { HuntingPlaceDetails } from "./hunts/HuntingPlaceDetails.jsx";
 import { EditHuntingPlace } from "./hunts/EditHuntingPlace.jsx";
 import { AddHuntingLocation } from "./hunts/AddHuntingLocation.jsx";
+import { AddCreature } from "./hunts/AddCreature.jsx";
 
 export const ApplicationViews = () => {
   return (
@@ -31,6 +32,10 @@ export const ApplicationViews = () => {
           <Route
             path="/hunting-places/add-location"
             element={<AddHuntingLocation />}
+          />
+          <Route
+            path="/hunting-places/add-creature"
+            element={<AddCreature />}
           />
           {/* ALL THE QUITE GUIDE ROUTES */}
           <Route path="/quest-guides" element={<QuestGuides />} />

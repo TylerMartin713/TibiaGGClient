@@ -1,22 +1,35 @@
 import { useState, useEffect } from "react";
 import { getCurrentUser } from "../services/userServices.jsx";
-import { GetUserCharacters } from "../../services/CharacterServices.jsx";
+import {
+  GetUserCharacters,
+  SearchAndAddCharacter,
+  DeleteCharacter,
+} from "../../services/CharacterServices.jsx";
 import {
   DeleteHuntingPlace,
   GetAllHuntingPlaces,
 } from "../../services/HuntingPlaceServices.jsx";
-import { GetUserFavorites } from "../../services/FavoriteServices.jsx";
+import {
+  GetUserFavorites,
+  RemoveFromFavorites,
+} from "../../services/FavoriteServices.jsx";
+import { GetAllVocations } from "../../services/VocationServices.jsx";
 import { useNavigate } from "react-router-dom";
+import { HuntingPlaceComments } from "../hunts/HuntingPlaceComments.jsx";
 
 export const Profile = () => {
   const [user, setUser] = useState(null);
   const [characters, setCharacters] = useState([]);
   const [favoritedHunts, setFavoritedHunts] = useState([]);
   const [userHunts, setUserHunts] = useState([]);
+  const [vocations, setVocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("characters");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -29,6 +42,10 @@ export const Profile = () => {
         // Fetch user's characters
         const charactersData = await GetUserCharacters();
         setCharacters(charactersData);
+
+        // Fetch vocations data for images
+        const vocationsData = await GetAllVocations();
+        setVocations(vocationsData);
 
         // Fetch all hunting places to filter user's hunts
         const allHunts = await GetAllHuntingPlaces();
@@ -51,6 +68,25 @@ export const Profile = () => {
     fetchUserData();
   }, []);
 
+  // Helper function to get vocation image by vocation name
+  const getVocationImage = (vocationName) => {
+    // Handle promoted vocations by extracting base vocation
+    const getBaseVocation = (vocName) => {
+      const lower = vocName.toLowerCase();
+      if (lower.includes("monk")) return "Monk";
+      if (lower.includes("druid")) return "Druid";
+      if (lower.includes("knight")) return "Knight";
+      if (lower.includes("paladin")) return "Paladin";
+      if (lower.includes("sorcerer")) return "Sorcerer";
+      return vocName; // fallback to original name
+    };
+
+    const baseVocation = getBaseVocation(vocationName);
+    const vocation = vocations.find(
+      (v) => v.name.toLowerCase() === baseVocation.toLowerCase()
+    );
+    return vocation?.image_url || null;
+  };
   const handleDelete = async (huntId) => {
     try {
       await DeleteHuntingPlace(huntId);
@@ -69,6 +105,84 @@ export const Profile = () => {
       )
     ) {
       handleDelete(huntId);
+    }
+  };
+
+  const handleRemoveFavorite = async (favoriteId) => {
+    try {
+      await RemoveFromFavorites(favoriteId);
+      // Remove the favorite from the state
+      setFavoritedHunts(favoritedHunts.filter((fav) => fav.id !== favoriteId));
+    } catch (err) {
+      setError("Failed to remove from favorites");
+      console.error("Error removing favorite:", err);
+    }
+  };
+
+  const confirmRemoveFavorite = (favoriteId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to remove this hunting place from your favorites?"
+      )
+    ) {
+      handleRemoveFavorite(favoriteId);
+    }
+  };
+
+  const handleSearchCharacter = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+
+    // Check if character already exists in our local list
+    const existingCharacter = characters.find(
+      (char) => char.name.toLowerCase() === searchQuery.toLowerCase()
+    );
+
+    if (existingCharacter) {
+      alert(`${searchQuery} is already in your character list!`);
+      setSearchQuery("");
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const characterData = await SearchAndAddCharacter(searchQuery);
+      // Add the character to our local state
+      setCharacters([...characters, characterData]);
+      setSearchQuery("");
+      alert(`${characterData.name} has been added to your characters!`);
+    } catch (error) {
+      console.error("Error searching character:", error);
+      // Check if error response contains specific message
+      if (error.message && error.message.includes("404")) {
+        alert(
+          `Character "${searchQuery}" not found in Tibia. Please check the spelling and try again.`
+        );
+      } else {
+        alert(`Failed to add character "${searchQuery}". Please try again.`);
+      }
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleDeleteCharacter = async (characterId) => {
+    try {
+      await DeleteCharacter(characterId);
+      setCharacters(characters.filter((char) => char.id !== characterId));
+    } catch (error) {
+      console.error("Error deleting character:", error);
+      alert("Failed to delete character. Please try again.");
+    }
+  };
+
+  const confirmDeleteCharacter = (characterId, characterName) => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${characterName}? This action cannot be undone.`
+      )
+    ) {
+      handleDeleteCharacter(characterId);
     }
   };
 
@@ -175,9 +289,25 @@ export const Profile = () => {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-white">My Characters</h2>
-              <button className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                Add Character
-              </button>
+              <div className="flex space-x-4">
+                <form onSubmit={handleSearchCharacter} className="flex">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Enter character name..."
+                    className="px-4 py-2 bg-gray-700 border border-gray-600 rounded-l-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    disabled={isSearching}
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSearching || !searchQuery.trim()}
+                    className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-800 disabled:cursor-not-allowed text-white px-4 py-2 rounded-r-lg font-medium transition-colors"
+                  >
+                    {isSearching ? "Searching..." : "Add Character"}
+                  </button>
+                </form>
+              </div>
             </div>
 
             {characters.length === 0 ? (
@@ -200,20 +330,45 @@ export const Profile = () => {
                     className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-amber-500 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-bold text-white">
-                        {character.name}
-                      </h3>
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-shrink-0">
+                          {getVocationImage(character.vocation) ? (
+                            <div className="w-16 h-16 bg-gray-700 rounded-lg border-2 border-amber-600 p-2 flex items-center justify-center">
+                              <img
+                                src={getVocationImage(character.vocation)}
+                                alt={character.vocation}
+                                className="max-w-full max-h-full object-contain"
+                                onError={(e) => {
+                                  e.target.style.display = "none";
+                                  e.target.nextElementSibling.style.display =
+                                    "block";
+                                }}
+                              />
+                              <div
+                                className="text-2xl"
+                                style={{ display: "none" }}
+                              >
+                                ⚔️
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="w-16 h-16 bg-gray-700 rounded-lg border-2 border-amber-600 flex items-center justify-center">
+                              <span className="text-2xl">⚔️</span>
+                            </div>
+                          )}
+                        </div>
+                        <h3 className="text-xl font-bold text-white">
+                          {character.name}
+                        </h3>
+                      </div>
                       <div className="flex space-x-2">
-                        <button className="text-amber-400 hover:text-amber-300 p-1">
-                          <svg
-                            className="w-8 h-8"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                        </button>
-                        <button className="text-red-400 hover:text-red-300 p-1">
+                        <button
+                          className="text-red-400 hover:text-red-300 p-1"
+                          onClick={() =>
+                            confirmDeleteCharacter(character.id, character.name)
+                          }
+                          title="Delete character"
+                        >
                           <svg
                             className="w-8 h-8"
                             fill="currentColor"
@@ -410,7 +565,10 @@ export const Profile = () => {
                 {favoritedHunts.map((favorite) => (
                   <div
                     key={favorite.id}
-                    className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-amber-500 transition-colors"
+                    className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-amber-500 transition-colors cursor-pointer"
+                    onClick={() =>
+                      navigate(`/hunting-places/${favorite.hunting_place.id}`)
+                    }
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -440,7 +598,10 @@ export const Profile = () => {
                       </div>
                       <button
                         className="text-red-400 hover:text-red-300 p-1"
-                        onClick={confirmDelete}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          confirmRemoveFavorite(favorite.id);
+                        }}
                         title="Remove from favorites"
                       >
                         <svg
@@ -489,7 +650,15 @@ export const Profile = () => {
                       )}
 
                     <div className="flex space-x-2 mt-4">
-                      <button className="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded text-sm font-medium transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(
+                            `/hunting-places/${favorite.hunting_place.id}`
+                          );
+                        }}
+                        className="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded text-sm font-medium transition-colors"
+                      >
                         View Details
                       </button>
                     </div>
