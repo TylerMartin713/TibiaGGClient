@@ -1,0 +1,61 @@
+// Quest system tables
+table quest {
+    id int [pk, increment]
+    name varchar [not null]
+    description text
+    min_level int
+    rec_level int
+    quest_type varchar // "main", "side", "daily", etc.
+    difficulty_rating int // 1-5 scale
+    estimated_duration varchar // "30 minutes", "2 hours", etc.
+    prerequisites text // text description of requirements
+    location varchar // starting location or main area
+    npc_start varchar // NPC that starts the quest
+    image_url varchar
+    created_at timestamp [default: `now()`]
+    updated_at timestamp [default: `now()`]
+    created_by int // foreign key to user who created the guide
+}
+
+table quest_mission {
+    id int [pk, increment]
+    quest_id int [ref: > quest.id, not null]
+    name varchar [not null]
+    description text
+    objective text [not null]
+    mission_order int [not null] // to maintain order of missions
+    steps text // JSON or text field with step-by-step instructions
+    location varchar // where this mission takes place
+    required_items text // items needed for this mission
+    notes text // additional tips or notes
+    created_at timestamp [default: `now()`]
+    updated_at timestamp [default: `now()`]
+}
+
+table quest_reward {
+    id int [pk, increment]
+    name varchar [not null]
+    description text
+    reward_type varchar [not null] // "experience", "item", "access", "money", etc.
+    value varchar // amount of exp, gp, or item name
+    image_url varchar
+    created_at timestamp [default: `now()`]
+}
+
+// Many-to-many relationship between quests and rewards
+table quest_quest_reward {
+    id int [pk, increment]
+    quest_id int [ref: > quest.id, not null]
+    reward_id int [ref: > quest_reward.id, not null]
+    mission_id int [ref: > quest_mission.id] // optional - if reward is for specific mission
+    reward_order int // to maintain display order
+}
+
+// Optional: Mission-specific rewards (if some missions have their own rewards)
+table mission_reward {
+    id int [pk, increment]
+    mission_id int [ref: > quest_mission.id, not null]
+    reward_id int [ref: > quest_reward.id, not null]
+    is_final_reward boolean [default: false] // true if this is the main quest completion reward
+}
+

@@ -7,7 +7,7 @@ export const Authorized = () => {
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col">
         <NavBar />
-        <main className="bg-gray-900 flex-grow">
+        <main className="bg-gray-900 flex-grow pt-16">
           <Outlet />
         </main>
         <Footer />
