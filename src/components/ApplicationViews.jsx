@@ -11,6 +11,7 @@ import { HuntingPlaceDetails } from "./hunts/HuntingPlaceDetails.jsx";
 import { EditHuntingPlace } from "./hunts/EditHuntingPlace.jsx";
 import { AddHuntingLocation } from "./hunts/AddHuntingLocation.jsx";
 import { AddCreature } from "./hunts/AddCreature.jsx";
+import { Calculators } from "./calculators/calculators.jsx";
 
 export const ApplicationViews = () => {
   return (
@@ -42,6 +43,9 @@ export const ApplicationViews = () => {
 
           {/* ALL THE PROFILE ROUTES */}
           <Route path="/profile" element={<Profile />} />
+
+          {/* ALL CALCULATOR ROUTES */}
+          <Route path="calculators" element={<Calculators />} />
         </Route>
       </Routes>
     </BrowserRouter>

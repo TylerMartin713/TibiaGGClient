@@ -43,6 +43,14 @@ export const Footer = () => {
                   Profile
                 </a>
               </li>
+              <li>
+                <a
+                  href="/calculators"
+                  className="text-gray-400 hover:text-amber-400 transition-colors"
+                >
+                  Calculators
+                </a>
+              </li>
             </ul>
           </div>
 
